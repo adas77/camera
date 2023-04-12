@@ -1,34 +1,47 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import Camera from './Camera'
+import { rand2 } from './data'
 
 function App() {
-  const [count, setCount] = useState(0)
-
+  const data = rand2(6, 150)
+  const [menu, setMenu] = useState(true)
   return (
-    <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
+    <>
+      <Camera rects={data} setMenu={setMenu} />
+      {menu
+        ?
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+          <p className='font-bold mb-12 text-3xl'>Naciśnij dowolny przycisk aby zagrać</p>
+          <p className='font-bold mt-1'>Sterowanie</p>
+          <ul className='mt-2'>
+            <li><b>0</b> - Początkowa pozycja</li>
+            <li><b>m</b> - Powrót do Menu</li>
+            <li><b>w</b> - Góra</li>
+            <li><b>s</b> - Dół</li>
+            <li><b>a</b> - Lewo</li>
+            <li><b>d</b> - Prawo</li>
+            <li><b>f</b> - Przód</li>
+            <li><b>b</b> - Tył</li>
+            <li><b>x</b> - Rotacja OX</li>
+            <li><b>1</b> - Rotacja OX - kierunek przeciwny</li>
+            <li><b>y</b> - Rotacja OY</li>
+            <li><b>2</b> - Rotacja OY - kierunek przeciwny</li>
+            <li><b>z</b> - Rotacja OZ</li>
+            <li><b>3</b> - Rotacja OZ - kierunek przeciwny</li>
+          </ul>
+          <div className='mt-8 ml-8 font-bold text-cyan-700 text-xl'>
+            <b><a href='https://github.com/adas77/camera'>Kod źródłowy</a></b>
+          </div>
+        </div>
+        :
+        <button
+          onClick={() => {
+            window.location.reload()
+          }}
+          className="absolute top-5 left-10 ">Menu
         </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </div>
+      }
+    </>
   )
 }
 
