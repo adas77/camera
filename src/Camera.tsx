@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { handleOnKey, rerender } from "./lib/draw";
+import { DEPTH } from "./consts";
 
 type Props = {
     rects: Point[][]
@@ -9,6 +10,7 @@ type Props = {
 const Camera = ({ rects, setMenu }: Props) => {
     const ref = useRef<HTMLCanvasElement>(null)
     const startPos = rects
+    globalThis.depth = DEPTH
 
     useEffect(() => {
         window.addEventListener('keydown', key => {
@@ -18,7 +20,7 @@ const Camera = ({ rects, setMenu }: Props) => {
             if (ref.current) {
                 const ctx = ref.current.getContext('2d')
                 if (ctx) {
-                    rerender(ctx, rects)
+                    rerender(ctx, rects, globalThis.depth)
                 }
             }
         })

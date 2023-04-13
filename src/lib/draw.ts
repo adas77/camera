@@ -1,19 +1,33 @@
+import { DEPTH_JUMP } from "../consts"
 import { proj, tr } from "./matrix"
 
-export function rerender(ctx: CanvasRenderingContext2D, rects: Point[][]) {
+export function rerender(ctx: CanvasRenderingContext2D, rects: Point[][], depth: number) {
     ctx.beginPath()
+    ctx.strokeStyle = 'black'
     ctx.clearRect(0, 0, window.innerWidth, window.innerHeight)
     rects.forEach((rect) => {
-        drawRect(rect, ctx)
+        drawRect(rect, ctx, depth)
     })
+    drawAxis(ctx)
+
 }
 
 export function handleOnKey(key: any, rects: Point[][], startpos?: Point[][]) {
     switch (key.key) {
         case 'm':
             window.location.reload()
+            break
+
         case '0':
             return startpos
+
+        case 'u':
+            globalThis.depth += DEPTH_JUMP
+            break
+
+        case 'i':
+            globalThis.depth -= DEPTH_JUMP
+            break
 
         case 'a':
             return nextPos(rects, 'left')
@@ -59,14 +73,46 @@ function nextPos(rects: Point[][], move: Move): Point[][] {
     return newPositions
 }
 
-function drawRect(rect: Point[], ctx: CanvasRenderingContext2D) {
-    const projected: Point2D[] = rect.map(rect => proj(rect))
+function drawRect(rect: Point[], ctx: CanvasRenderingContext2D, depth: number) {
+    const projected: Point2D[] = rect.map(rect => proj(rect, depth))
 
     for (let i = 0; i < 4; i++) {
         connect(i, (i + 1) % 4, projected, ctx);
         connect(i + 4, ((i + 1) % 4) + 4, projected, ctx);
         connect(i, i + 4, projected, ctx);
     }
+}
+
+function drawAxis(ctx: CanvasRenderingContext2D) {
+    const startpos: Point2D = proj({
+        x: 0,
+        y: 0,
+        z: 0,
+    }, globalThis.depth)
+
+    const x: Point2D = proj({
+        x: window.innerWidth,
+        y: 0,
+        z: 0,
+    }, globalThis.depth)
+    const y: Point2D = proj({
+        x: 0,
+        y: window.innerWidth,
+        z: 0
+    }, globalThis.depth)
+
+
+    ctx.beginPath()
+    ctx.strokeStyle = 'green'
+    ctx.moveTo(startpos.x, startpos.y)
+    ctx.lineTo(x.x, x.y)
+    ctx.stroke()
+
+    ctx.beginPath()
+    ctx.strokeStyle = 'red'
+    ctx.moveTo(startpos.x, startpos.y)
+    ctx.lineTo(y.x, y.y)
+    ctx.stroke()
 }
 
 function connect(i: number, j: number, points: Point2D[], ctx: CanvasRenderingContext2D) {

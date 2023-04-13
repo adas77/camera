@@ -16,6 +16,8 @@ function App() {
           <ul className='mt-2'>
             <li><b>0</b> - Początkowa pozycja</li>
             <li><b>m</b> - Powrót do Menu</li>
+            <li><b>u</b> - Zoom In</li>
+            <li><b>i</b> - Zoom Out</li>
             <li><b>w</b> - Góra</li>
             <li><b>s</b> - Dół</li>
             <li><b>a</b> - Lewo</li>
