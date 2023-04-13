@@ -90,6 +90,7 @@ export function tr(point: Point, move: Move, jump = JUMP, angle = ANGLE_DEG): Po
 }
 
 export function proj(p: Point, depth: number): Point2D {
+    if (depth <= 0) return { x: 0, y: 0 }
     const projScale = depth / (depth + p.z)
     const x = window.innerWidth / 2 + projScale * p.x
     const y = window.innerHeight / 2 + projScale * p.y

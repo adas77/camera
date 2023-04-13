@@ -20,7 +20,7 @@ const Camera = ({ rects, setMenu }: Props) => {
             if (ref.current) {
                 const ctx = ref.current.getContext('2d')
                 if (ctx) {
-                    rerender(ctx, rects, globalThis.depth)
+                    rerender(ctx, rects, globalThis.depth > 0 ? globalThis.depth : 1)
                 }
             }
         })
