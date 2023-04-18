@@ -1,5 +1,5 @@
 import { Unit, cos, matrix, multiply, sin, unit } from 'mathjs';
-import { ANGLE_DEG, JUMP } from '../consts';
+import { ANGLE_DEG, E, JUMP } from '../consts';
 
 export function tr(point: Point, move: Move, jump = JUMP, angle = ANGLE_DEG): Point {
     const ANGLE_POS: Unit = unit(angle, 'deg')
@@ -89,15 +89,21 @@ export function tr(point: Point, move: Move, jump = JUMP, angle = ANGLE_DEG): Po
     return res
 }
 
-export function proj(p: Point, depth: number): Point2D {
-    if (depth <= 0) return { x: 0, y: 0 }
-    const projScale = depth / (depth + p.z)
-    const x = window.innerWidth / 2 + projScale * p.x
-    const y = window.innerHeight / 2 + projScale * p.y
+export function proj(p: Point): Point2D {
+    const depth = globalThis.depth > 0 ? globalThis.depth : E
 
+    // const projScale = depth / (depth + p.z)
+    // const p2d: Point2D = {
+    //     x: window.innerWidth / 2 + projScale * p.x,
+    //     y: window.innerHeight / 2 + projScale * p.y,
+    // }
+    // return p2d
+
+    const Z = p.z > 0 ? p.z : E
+    const f = depth / Z
     const p2d: Point2D = {
-        x,
-        y,
+        x: window.innerWidth / 2 + f * p.x,
+        y: window.innerHeight / 2 + f * p.y,
     }
     return p2d
 }

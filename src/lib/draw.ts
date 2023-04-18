@@ -1,12 +1,12 @@
-import { DEPTH_JUMP } from "../consts"
+import { DEPTH, DEPTH_JUMP } from "../consts"
 import { proj, tr } from "./matrix"
 
-export function rerender(ctx: CanvasRenderingContext2D, rects: Point[][], depth: number) {
+export function rerender(ctx: CanvasRenderingContext2D, rects: Point[][]) {
     ctx.beginPath()
     ctx.strokeStyle = 'black'
     ctx.clearRect(0, 0, window.innerWidth, window.innerHeight)
     rects.forEach((rect) => {
-        drawRect(rect, ctx, depth)
+        drawRect(rect, ctx)
     })
     drawAxis(ctx)
 
@@ -16,6 +16,10 @@ export function handleOnKey(key: any, rects: Point[][], startpos?: Point[][]) {
     switch (key.key) {
         case 'm':
             window.location.reload()
+            break
+
+        case '-':
+            globalThis.depth = DEPTH
             break
 
         case '0':
@@ -73,8 +77,8 @@ function nextPos(rects: Point[][], move: Move): Point[][] {
     return newPositions
 }
 
-function drawRect(rect: Point[], ctx: CanvasRenderingContext2D, depth: number) {
-    const projected: Point2D[] = rect.map(rect => proj(rect, depth))
+function drawRect(rect: Point[], ctx: CanvasRenderingContext2D) {
+    const projected: Point2D[] = rect.map(rect => proj(rect))
 
     for (let i = 0; i < 4; i++) {
         connect(i, (i + 1) % 4, projected, ctx);
@@ -88,18 +92,23 @@ function drawAxis(ctx: CanvasRenderingContext2D) {
         x: 0,
         y: 0,
         z: 0,
-    }, globalThis.depth)
+    })
 
     const x: Point2D = proj({
         x: window.innerWidth,
         y: 0,
         z: 0,
-    }, globalThis.depth)
+    })
     const y: Point2D = proj({
         x: 0,
         y: window.innerWidth,
         z: 0
-    }, globalThis.depth)
+    })
+    // const z: Point2D = proj({
+    //     x: 0,
+    //     y: 0,
+    //     z: window.innerWidth,
+    // })
 
 
     ctx.beginPath()

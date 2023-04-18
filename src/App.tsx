@@ -14,6 +14,7 @@ function App() {
           <p className='font-bold mb-12 text-3xl'>Naciśnij dowolny przycisk aby zagrać</p>
           <p className='font-bold mt-1'>Sterowanie</p>
           <ul className='mt-2'>
+            <li><b>-</b> - Reset Zoom</li>
             <li><b>0</b> - Początkowa pozycja</li>
             <li><b>m</b> - Powrót do Menu</li>
             <li><b>u</b> - Zoom In</li>
