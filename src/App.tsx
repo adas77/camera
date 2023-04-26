@@ -3,11 +3,11 @@ import Camera from './Camera'
 import { rand2 } from './data'
 
 function App() {
-  const data = rand2(6, 150)
-  const [menu, setMenu] = useState(true)
+  const data = rand2(6, 150);
+  const [menu, setMenu] = useState(true);
+  window.addEventListener('keydown', _key => { setMenu(false) });
   return (
     <>
-      <Camera rects={data} setMenu={setMenu} />
       {menu
         ?
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
@@ -37,12 +37,16 @@ function App() {
           </div>
         </div>
         :
-        <button
-          onClick={() => {
-            window.location.reload()
-          }}
-          className="absolute top-5 left-10 ">Menu
-        </button>
+        <>
+          <button
+            onClick={() => {
+              window.location.reload();
+            }}
+            className="absolute top-5 left-10 ">
+            Menu
+          </button>
+          <Camera rects={data} />
+        </>
       }
     </>
   )

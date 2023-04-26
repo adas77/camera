@@ -10,3 +10,10 @@ type Point2D = {
     x: number,
     y: number,
 }
+
+type Wall = {
+    a: Point,
+    b: Point,
+    c: Point,
+    d: Point,
+}

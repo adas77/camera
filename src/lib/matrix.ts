@@ -2,8 +2,8 @@ import { Unit, cos, matrix, multiply, sin, unit } from 'mathjs';
 import { ANGLE_DEG, E, JUMP } from '../consts';
 
 export function tr(point: Point, move: Move, jump = JUMP, angle = ANGLE_DEG): Point {
-    const ANGLE_POS: Unit = unit(angle, 'deg')
-    const ANGLE_NEG: Unit = unit(-angle, 'deg')
+    const ANGLE_POS: Unit = unit(angle, 'deg');
+    const ANGLE_NEG: Unit = unit(-angle, 'deg');
 
     const p = matrix([point.x, point.y, point.z, 1])
     const base = matrix(
@@ -13,7 +13,7 @@ export function tr(point: Point, move: Move, jump = JUMP, angle = ANGLE_DEG): Po
             [0, 0, 1, 0],
             [0, 0, 0, 1],
         ]
-    )
+    );
 
     switch (move) {
         case 'left':
@@ -79,18 +79,18 @@ export function tr(point: Point, move: Move, jump = JUMP, angle = ANGLE_DEG): Po
 
     }
 
-    const mul = multiply(base, p)
+    const mul = multiply(base, p);
     const res: Point = {
         x: mul.get([0]),
         y: mul.get([1]),
         z: mul.get([2]),
-    }
+    };
 
-    return res
+    return res;
 }
 
 export function proj(p: Point): Point2D {
-    const depth = globalThis.depth > 0 ? globalThis.depth : E
+    const depth = globalThis.depth > 0 ? globalThis.depth : E;
 
     // const projScale = depth / (depth + p.z)
     // const p2d: Point2D = {
@@ -99,11 +99,12 @@ export function proj(p: Point): Point2D {
     // }
     // return p2d
 
-    const Z = p.z > 0 ? p.z : E
-    const f = depth / Z
+    const Z = p.z > 0 ? p.z : E;
+    const f = depth / Z;
     const p2d: Point2D = {
         x: window.innerWidth / 2 + f * p.x,
         y: window.innerHeight / 2 + f * p.y,
-    }
-    return p2d
+    };
+
+    return p2d;
 }
