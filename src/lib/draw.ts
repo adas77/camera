@@ -99,7 +99,8 @@ function drawRect2(rect: Point[], ctx: CanvasRenderingContext2D) {
     ];
 
     walls.sort((a, b) => countCenter(b) - countCenter(a));
-    connectWalls(walls, ctx);
+    const walls_ = walls.slice(-3);
+    connectWalls(walls_, ctx);
 }
 
 function countCenter(w: Wall): number {
@@ -181,6 +182,9 @@ function connectWalls(walls: Wall[], ctx: CanvasRenderingContext2D) {
         ctx.lineTo(d_.x, d_.y);
         ctx.stroke();
         ctx.fill();
+
+        ctx.lineTo(a_.x, a_.y);
+        ctx.stroke();
     })
     ctx.closePath();
 
