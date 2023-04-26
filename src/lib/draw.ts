@@ -9,7 +9,6 @@ export function rerender(ctx: CanvasRenderingContext2D, rects: Point[][], painte
         painted ? drawRect2(rect, ctx) : drawRect(rect, ctx);
     })
     drawAxis(ctx);
-
 }
 
 export function handleOnKey(key: any, rects: Point[][], startpos: Point[][]) {
@@ -88,7 +87,8 @@ function drawRect(rect: Point[], ctx: CanvasRenderingContext2D) {
 }
 
 function drawRect2(rect: Point[], ctx: CanvasRenderingContext2D) {
-    // const rect = rect_.map(r => proj(r))
+    ctx.fillStyle = "green";
+
     const walls: Wall[] = [
         { a: rect[0], b: rect[1], c: rect[2], d: rect[3] },
         { a: rect[4], b: rect[5], c: rect[6], d: rect[7] },
@@ -112,7 +112,6 @@ function countCenter(w: Wall): number {
     const center = Math.sqrt(Math.pow(p3d.x, 2) + Math.pow(p3d.y, 2) + Math.pow(p3d.z, 2));
 
     return center;
-
 }
 
 function drawAxis(ctx: CanvasRenderingContext2D) {
@@ -160,10 +159,8 @@ function connect(i: number, j: number, points: Point2D[], ctx: CanvasRenderingCo
 }
 
 function connectWalls(walls: Wall[], ctx: CanvasRenderingContext2D) {
-    ctx.beginPath();
-    ctx.fillStyle = "green";
-
     walls.forEach(w => {
+        ctx.beginPath();
         const a_ = proj(w.a);
         const b_ = proj(w.b);
         const c_ = proj(w.c);
@@ -172,15 +169,15 @@ function connectWalls(walls: Wall[], ctx: CanvasRenderingContext2D) {
         ctx.moveTo(a_.x, a_.y)
 
         ctx.lineTo(b_.x, b_.y);
-        ctx.stroke();
+        // ctx.stroke();
         ctx.fill();
 
         ctx.lineTo(c_.x, c_.y);
-        ctx.stroke();
+        // ctx.stroke();
         ctx.fill();
 
         ctx.lineTo(d_.x, d_.y);
-        ctx.stroke();
+        // ctx.stroke();
         ctx.fill();
 
         ctx.lineTo(a_.x, a_.y);
