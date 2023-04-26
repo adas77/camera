@@ -6,4 +6,5 @@ export const E: number = 0.001
 
 declare global {
     var depth: number
+    var pos: Point[][]
 }

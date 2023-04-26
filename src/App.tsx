@@ -1,6 +1,6 @@
-import { useState } from 'react'
-import Camera from './Camera'
-import { rand2 } from './data'
+import { useState } from 'react';
+import Camera from './Camera';
+import { rand2 } from './data';
 
 function App() {
   const data = rand2(6, 150);

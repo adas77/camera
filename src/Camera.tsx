@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { DEPTH } from "./consts";
 import { getCtx, handleOnKey, rerender } from "./lib/draw";
 
+globalThis.depth = DEPTH;
+
 type Props = {
     rects: Point[][]
 }
@@ -9,20 +11,17 @@ type Props = {
 const Camera = ({ rects }: Props) => {
     const [painted, setPainted] = useState(false);
     const ref = useRef<HTMLCanvasElement>(null);
-    let pos = rects;
-    globalThis.depth = DEPTH;
 
     useEffect(() => {
         const ctx = getCtx(ref);
         window.addEventListener('keydown', key => {
-            let res = handleOnKey(key, pos, rects);
-            if (res) pos = res;
-            rerender(ctx, pos, painted);
+            let res = handleOnKey(key, globalThis.pos || rects, rects);
+            if (res) globalThis.pos = res
+            rerender(ctx, globalThis.pos || rects, painted);
         })
-        rerender(ctx, pos, painted);
+        rerender(ctx, globalThis.pos || rects, painted);
 
     }, [painted])
-
 
     return (
         <>
