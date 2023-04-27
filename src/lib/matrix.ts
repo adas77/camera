@@ -89,9 +89,8 @@ export function tr(point: Point, move: Move, jump = JUMP, angle = ANGLE_DEG): Po
     return res;
 }
 
-export function proj(p: Point): Point2D {
-    const depth = globalThis.depth > 0 ? globalThis.depth : E;
-
+export function proj(p: Point, d: number): Point2D {
+    const depth = d > 0 ? d : E;
     // const projScale = depth / (depth + p.z)
     // const p2d: Point2D = {
     //     x: window.innerWidth / 2 + projScale * p.x,

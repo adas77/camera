@@ -1,35 +1,39 @@
 import { DEPTH, DEPTH_JUMP } from "../consts";
 import { proj, tr } from "./matrix";
 
-export function rerender(ctx: CanvasRenderingContext2D, rects: Point[][], painted: boolean) {
+export function rerender(ctx: CanvasRenderingContext2D, rects: Point[][], painted: boolean, depth: number) {
     ctx.beginPath();
     ctx.strokeStyle = 'black';
     ctx.clearRect(0, 0, window.innerWidth, window.innerHeight)
     rects.forEach((rect) => {
-        painted ? drawRect2(rect, ctx) : drawRect(rect, ctx);
+        painted ? drawRect2(rect, ctx, depth) : drawRect(rect, ctx, depth);
     })
-    drawAxis(ctx);
+    drawAxis(ctx, depth);
 }
 
-export function handleOnKey(key: any, rects: Point[][], startpos: Point[][]) {
-    switch (key.key) {
+export function handleOnKey(key: string, rects: Point[][], startpos: Point[][], setDepth: React.Dispatch<React.SetStateAction<number>>, setPainted: React.Dispatch<React.SetStateAction<boolean>>) {
+    switch (key) {
+        case ' ':
+            setPainted(prev => !prev);
+            break;
+
         case 'm':
             window.location.reload();
             break;
 
         case '-':
-            globalThis.depth = DEPTH;
+            setDepth(DEPTH);
             break;
 
         case '0':
             return startpos;
 
         case 'u':
-            globalThis.depth += DEPTH_JUMP;
+            setDepth(prev => prev + DEPTH_JUMP);
             break;
 
         case 'i':
-            globalThis.depth -= DEPTH_JUMP;
+            setDepth(prev => prev - DEPTH_JUMP);
             break;
 
         case 'a':
@@ -76,8 +80,8 @@ function nextPos(rects: Point[][], move: Move): Point[][] {
     return newPositions;
 }
 
-function drawRect(rect: Point[], ctx: CanvasRenderingContext2D) {
-    const projected: Point2D[] = rect.map(r => proj(r));
+function drawRect(rect: Point[], ctx: CanvasRenderingContext2D, depth: number) {
+    const projected: Point2D[] = rect.map(r => proj(r, depth));
 
     for (let i = 0; i < 4; i++) {
         connect(i, (i + 1) % 4, projected, ctx);
@@ -86,7 +90,7 @@ function drawRect(rect: Point[], ctx: CanvasRenderingContext2D) {
     }
 }
 
-function drawRect2(rect: Point[], ctx: CanvasRenderingContext2D) {
+function drawRect2(rect: Point[], ctx: CanvasRenderingContext2D, depth: number) {
     ctx.fillStyle = "green";
 
     const walls: Wall[] = [
@@ -100,7 +104,7 @@ function drawRect2(rect: Point[], ctx: CanvasRenderingContext2D) {
 
     walls.sort((a, b) => countCenter(b) - countCenter(a));
     const walls_ = walls.slice(-3);
-    connectWalls(walls_, ctx);
+    connectWalls(walls_, ctx, depth);
 }
 
 function countCenter(w: Wall): number {
@@ -114,23 +118,23 @@ function countCenter(w: Wall): number {
     return center;
 }
 
-function drawAxis(ctx: CanvasRenderingContext2D) {
+function drawAxis(ctx: CanvasRenderingContext2D, depth: number) {
     const startpos: Point2D = proj({
         x: 0,
         y: 0,
         z: 0,
-    });
+    }, depth);
 
     const x: Point2D = proj({
         x: window.innerWidth,
         y: 0,
         z: 0,
-    });
+    }, depth);
     const y: Point2D = proj({
         x: 0,
         y: window.innerWidth,
         z: 0
-    });
+    }, depth);
     // const z: Point2D = proj({
     //     x: 0,
     //     y: 0,
@@ -158,13 +162,13 @@ function connect(i: number, j: number, points: Point2D[], ctx: CanvasRenderingCo
     ctx.stroke();
 }
 
-function connectWalls(walls: Wall[], ctx: CanvasRenderingContext2D) {
+function connectWalls(walls: Wall[], ctx: CanvasRenderingContext2D, depth: number) {
     walls.forEach(w => {
         ctx.beginPath();
-        const a_ = proj(w.a);
-        const b_ = proj(w.b);
-        const c_ = proj(w.c);
-        const d_ = proj(w.d);
+        const a_ = proj(w.a, depth);
+        const b_ = proj(w.b, depth);
+        const c_ = proj(w.c, depth);
+        const d_ = proj(w.d, depth);
 
         ctx.moveTo(a_.x, a_.y)
 

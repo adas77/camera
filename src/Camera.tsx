@@ -2,26 +2,29 @@ import { useEffect, useRef, useState } from "react";
 import { DEPTH } from "./consts";
 import { getCtx, handleOnKey, rerender } from "./lib/draw";
 
-globalThis.depth = DEPTH;
-
 type Props = {
     rects: Point[][]
 }
 
 const Camera = ({ rects }: Props) => {
+    const [pos, setPos] = useState<Point[][]>(rects)
     const [painted, setPainted] = useState(false);
+    const [depth, setDepth] = useState(DEPTH)
     const ref = useRef<HTMLCanvasElement>(null);
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+        const res = handleOnKey(e.key, pos, rects, setDepth, setPainted);
+        if (res) setPos(res)
+    }
 
     useEffect(() => {
         const ctx = getCtx(ref);
-        window.addEventListener('keydown', key => {
-            let res = handleOnKey(key, globalThis.pos || rects, rects);
-            if (res) globalThis.pos = res
-            rerender(ctx, globalThis.pos || rects, painted);
-        })
-        rerender(ctx, globalThis.pos || rects, painted);
-
-    }, [painted])
+        rerender(ctx, pos, painted, depth);
+        window.addEventListener('keydown', handleKeyDown)
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        }
+    }, [pos, depth, painted])
 
     return (
         <>
