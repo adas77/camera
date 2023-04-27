@@ -5,9 +5,24 @@ export function rerender(ctx: CanvasRenderingContext2D, rects: Point[][], painte
     ctx.beginPath();
     ctx.strokeStyle = 'black';
     ctx.clearRect(0, 0, window.innerWidth, window.innerHeight)
-    rects.forEach((rect) => {
-        painted ? drawRect2(rect, ctx, depth) : drawRect(rect, ctx, depth);
-    })
+    ctx.fillStyle = "yellow";
+
+    if (painted) {
+        const walls: Wall[] = []
+        rects.forEach((rect) => {
+            walls.push({ a: rect[0], b: rect[1], c: rect[2], d: rect[3] });
+            walls.push({ a: rect[4], b: rect[5], c: rect[6], d: rect[7] });
+            walls.push({ a: rect[0], b: rect[4], c: rect[5], d: rect[1] });
+            walls.push({ a: rect[3], b: rect[7], c: rect[6], d: rect[2] });
+            walls.push({ a: rect[0], b: rect[3], c: rect[7], d: rect[4] });
+            walls.push({ a: rect[1], b: rect[2], c: rect[6], d: rect[5] });
+        })
+        walls.sort((a, b) => countCenter(b) - countCenter(a));
+        connectWalls(walls, ctx, depth);
+    }
+    else {
+        rects.forEach((rect) => drawRect(rect, ctx, depth));
+    }
     drawAxis(ctx, depth);
 }
 
