@@ -91,7 +91,7 @@ function drawRect(rect: Point[], ctx: CanvasRenderingContext2D, depth: number) {
 }
 
 function drawRect2(rect: Point[], ctx: CanvasRenderingContext2D, depth: number) {
-    ctx.fillStyle = "green";
+    ctx.fillStyle = "yellow";
 
     const walls: Wall[] = [
         { a: rect[0], b: rect[1], c: rect[2], d: rect[3] },
