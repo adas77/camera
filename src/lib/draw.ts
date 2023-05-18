@@ -1,4 +1,4 @@
-import { DEPTH, DEPTH_JUMP, E } from "../consts";
+import { DEPTH, DEPTH_JUMP } from "../consts";
 import { proj, tr } from "./matrix";
 
 export function rerender(
@@ -35,10 +35,8 @@ export function handleOnKey(
   rects: Point[][],
   startpos: Point[][],
   setDepth: React.Dispatch<React.SetStateAction<number>>,
-  setPainted: React.Dispatch<React.SetStateAction<boolean>>,
-  painted: boolean
+  setPainted: React.Dispatch<React.SetStateAction<boolean>>
 ) {
-  console.log("painted:", painted);
   switch (key) {
     case " ":
       setPainted((prev) => !prev);

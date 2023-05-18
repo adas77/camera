@@ -31,3 +31,8 @@ type Wall = {
   c: Point;
   d: Point;
 };
+
+type Data = {
+  rects: Point[][];
+  label: string;
+};

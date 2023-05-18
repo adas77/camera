@@ -1,14 +1,20 @@
 import { useState } from "react";
 import Camera from "./Camera";
-import { rand2 } from "./data";
+import { basic, grow, rand1, rand2 } from "./data";
 
 export function Prompt() {
   return (
-    <>
-      <p className="font-bold mt-1">Sterowanie</p>
-      <ul className="mt-2">
+    <div>
+      <p className="font-bold mb-4 text-l">Sterowanie</p>
+      <ul>
         <li>
           <b>SPACJA</b> - Zmień tryb wyświetlania
+        </li>
+        <li>
+          <b>u</b> - Zoom In
+        </li>
+        <li>
+          <b>i</b> - Zoom Out
         </li>
         <li>
           <b>-</b> - Reset Zoom
@@ -18,12 +24,6 @@ export function Prompt() {
         </li>
         <li>
           <b>m</b> - Powrót do Menu
-        </li>
-        <li>
-          <b>u</b> - Zoom In
-        </li>
-        <li>
-          <b>i</b> - Zoom Out
         </li>
         <li>
           <b>w</b> - Góra
@@ -62,13 +62,39 @@ export function Prompt() {
           <b>3</b> - Rotacja OZ - kierunek przeciwny
         </li>
       </ul>
-    </>
+    </div>
+  );
+}
+
+type ChooseDataProps = {
+  data: Data;
+  dataSet: Data[];
+  setData: React.Dispatch<React.SetStateAction<Data>>;
+};
+export function ChooseData({ data, dataSet, setData }: ChooseDataProps) {
+  return (
+    <select className="block focus:outline-none text-white bg-purple-700 hover:bg-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-purple-600 dark:hover:bg-purple-700">
+      <option selected>{data.label}</option>
+      {dataSet
+        .filter((d) => d.label !== data.label)
+        .map((d) => (
+          <option onClick={() => setData(d)} key={d.label} value={d.label}>
+            {d.label}
+          </option>
+        ))}
+    </select>
   );
 }
 
 function App() {
-  const data = rand2(6, 150);
+  const dataSet: Data[] = [
+    { rects: rand1(4, 20), label: "Random 1" },
+    { rects: rand2(4, 500), label: "Random 2" },
+    { rects: grow(12), label: "Grow" },
+    { rects: basic(), label: "Basic" },
+  ];
   const [menu, setMenu] = useState(true);
+  const [data, setData] = useState(dataSet[0]);
   window.addEventListener("keydown", (_key) => {
     setMenu(false);
   });
@@ -80,14 +106,16 @@ function App() {
             Naciśnij dowolny przycisk aby zagrać
           </p>
           <Prompt />
-          <div className="mt-8 ml-8 font-bold text-cyan-700 text-xl">
-            <b>
-              <a href="https://github.com/adas77/camera">Kod źródłowy</a>
-            </b>
-          </div>
+          <br />
+          <a
+            className="font-bold text-cyan-700 text-xl"
+            href="https://github.com/adas77/camera"
+          >
+            Kod źródłowy
+          </a>
         </div>
       ) : (
-        <Camera rects={data} />
+        <Camera data={data} dataSet={dataSet} setData={setData} />
       )}
     </>
   );

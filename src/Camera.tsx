@@ -1,21 +1,23 @@
 import { useEffect, useRef, useState } from "react";
+import { ChooseData, Prompt } from "./App";
 import { DEPTH } from "./consts";
 import { getCtx, handleOnKey, rerender } from "./lib/draw";
-import { Prompt } from "./App";
 
 type Props = {
-  rects: Point[][];
+  data: Data;
+  dataSet: Data[];
+  setData: React.Dispatch<React.SetStateAction<Data>>;
 };
 
-const Camera = ({ rects }: Props) => {
-  const [pos, setPos] = useState<Point[][]>(rects);
-  const [painted, setPainted] = useState(false);
+const Camera = ({ data, dataSet, setData }: Props) => {
+  const [pos, setPos] = useState<Point[][]>(data.rects);
+  const [painted, setPainted] = useState(true);
   const [depth, setDepth] = useState(DEPTH);
   const [showPrompt, setShowPrompt] = useState(false);
   const ref = useRef<HTMLCanvasElement>(null);
 
   const handleKeyDown = (e: KeyboardEvent) => {
-    const res = handleOnKey(e.key, pos, rects, setDepth, setPainted, painted);
+    const res = handleOnKey(e.key, pos, data.rects, setDepth, setPainted);
     if (res) setPos(res);
   };
 
@@ -26,7 +28,11 @@ const Camera = ({ rects }: Props) => {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [pos, depth, painted, setPainted]);
+  }, [pos, depth, painted, setPainted, data, setData]);
+
+  useEffect(() => {
+    setPos(data.rects);
+  }, [data, setData]);
 
   return (
     <>
@@ -47,6 +53,7 @@ const Camera = ({ rects }: Props) => {
           >
             Show Prompt
           </button>
+          <ChooseData data={data} dataSet={dataSet} setData={setData} />
         </div>
         <div className="flex gap-1">
           <button
@@ -64,7 +71,7 @@ const Camera = ({ rects }: Props) => {
         </div>
       </div>
       {showPrompt && (
-        <div className="absolute top-5 right-10">
+        <div className="absolute top-24 left-10">
           <Prompt />
         </div>
       )}
