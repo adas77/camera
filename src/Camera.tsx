@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { ChooseData, Prompt } from "./App";
-import { DEPTH } from "./consts";
+import { DEPTH, DEPTH_JUMP, SCREEN } from "./consts";
 import { getCtx, handleOnKey, rerender } from "./lib/draw";
 
 type Props = {
@@ -11,24 +11,25 @@ type Props = {
 
 const Camera = ({ data, dataSet, setData }: Props) => {
   const [pos, setPos] = useState<Point[][]>(data.rects);
-  const [painted, setPainted] = useState(true);
+  // const [painted, setPainted] = useState(true);
+  const [view, setView] = useState<View>("sphere");
   const [depth, setDepth] = useState(DEPTH);
   const [showPrompt, setShowPrompt] = useState(false);
   const ref = useRef<HTMLCanvasElement>(null);
 
   const handleKeyDown = (e: KeyboardEvent) => {
-    const res = handleOnKey(e.key, pos, data.rects, setDepth, setPainted);
+    const res = handleOnKey(e.key, pos, data.rects, setDepth, setView);
     if (res) setPos(res);
   };
 
   useEffect(() => {
     const ctx = getCtx(ref);
-    rerender(ctx, pos, painted, depth);
+    rerender(ctx, pos, view, depth);
     window.addEventListener("keydown", handleKeyDown);
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [pos, depth, painted, setPainted, data, setData]);
+  }, [pos, depth, view, setView, data, setData]);
 
   useEffect(() => {
     setPos(data.rects);
@@ -66,7 +67,7 @@ const Camera = ({ data, dataSet, setData }: Props) => {
             disabled
             className="py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 bg-white rounded-lg border border-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700"
           >
-            Mode: {painted ? "Linie" : "Połączone"}
+            Mode: {view}
           </button>
         </div>
       </div>
@@ -75,7 +76,20 @@ const Camera = ({ data, dataSet, setData }: Props) => {
           <Prompt />
         </div>
       )}
-      <canvas width={window.innerWidth} height={window.innerHeight} ref={ref} />
+      <canvas
+        onWheel={(e) => {
+          const f = e.deltaY < 0 ? -1 : e.deltaY > 0 ? 1 : undefined;
+          if (f) {
+            setDepth((prev) => {
+              if (prev <= DEPTH_JUMP && f === -1) return DEPTH_JUMP;
+              else return prev + f * DEPTH_JUMP;
+            });
+          }
+        }}
+        width={SCREEN.W}
+        height={SCREEN.H}
+        ref={ref}
+      />
     </>
   );
 };

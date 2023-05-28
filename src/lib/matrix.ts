@@ -1,5 +1,5 @@
 import { Unit, cos, matrix, multiply, sin, unit } from "mathjs";
-import { ANGLE_DEG, E, JUMP } from "../consts";
+import { ANGLE_DEG, E, JUMP, SCREEN } from "../consts";
 
 export function tr(
   point: Point,
@@ -104,8 +104,8 @@ export function proj(p: Point, d: number): Point2D {
   const Z = p.z > 0 ? p.z : E;
   const f = d / Z;
   const p2d: Point2D = {
-    x: window.innerWidth / 2 + f * p.x,
-    y: window.innerHeight / 2 + f * p.y,
+    x: SCREEN.W / 2 + f * p.x,
+    y: SCREEN.H / 2 + f * p.y,
   };
 
   return p2d;

@@ -1,32 +1,55 @@
-import { DEPTH, DEPTH_JUMP } from "../consts";
+import { DEPTH, DEPTH_JUMP, SCREEN } from "../consts";
 import { proj, tr } from "./matrix";
+import { drawPhongSphere } from "./phong";
 
 export function rerender(
   ctx: CanvasRenderingContext2D,
   rects: Point[][],
-  painted: boolean,
+  view: View,
   depth: number
 ) {
   ctx.beginPath();
-  ctx.strokeStyle = "black";
-  ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-  ctx.fillStyle = "yellow";
+  ctx.clearRect(0, 0, SCREEN.W, SCREEN.H);
+  // ctx.strokeStyle = "orange";
+  // ctx.fillStyle = COLOR;
 
-  if (painted) {
-    const walls: Wall[] = [];
-    rects.forEach((rect) => {
-      walls.push({ a: rect[0], b: rect[1], c: rect[2], d: rect[3] });
-      walls.push({ a: rect[4], b: rect[5], c: rect[6], d: rect[7] });
-      walls.push({ a: rect[0], b: rect[4], c: rect[5], d: rect[1] });
-      walls.push({ a: rect[3], b: rect[7], c: rect[6], d: rect[2] });
-      walls.push({ a: rect[0], b: rect[3], c: rect[7], d: rect[4] });
-      walls.push({ a: rect[1], b: rect[2], c: rect[6], d: rect[5] });
-    });
-    walls.sort((a, b) => countCenter(b) - countCenter(a));
-    connectWalls(walls, ctx, depth);
-  } else {
-    rects.forEach((rect) => drawRect(rect, ctx, depth));
+  switch (view) {
+    case "mesh":
+      const walls: Wall[] = [];
+      rects.forEach((rect) => {
+        walls.push({ a: rect[0], b: rect[1], c: rect[2], d: rect[3] });
+        walls.push({ a: rect[4], b: rect[5], c: rect[6], d: rect[7] });
+        walls.push({ a: rect[0], b: rect[4], c: rect[5], d: rect[1] });
+        walls.push({ a: rect[3], b: rect[7], c: rect[6], d: rect[2] });
+        walls.push({ a: rect[0], b: rect[3], c: rect[7], d: rect[4] });
+        walls.push({ a: rect[1], b: rect[2], c: rect[6], d: rect[5] });
+      });
+      walls.sort((a, b) => countCenter(b) - countCenter(a));
+      connectWalls(walls, ctx, depth);
+      break;
+
+    case "painted":
+      rects.forEach((rect) => drawRect(rect, ctx, depth));
+      break;
+
+    case "sphere":
+      const sphere: Sphere = {
+        center: { x: SCREEN.W / 2, y: SCREEN.H / 2, z: 0 },
+        radius: Math.min(SCREEN.W, SCREEN.H) / 2,
+      };
+
+      const light: SphereLight = {
+        pos: { x: SCREEN.W / 2, y: SCREEN.H / 2, z: -100 },
+        ambient: 0.2,
+        diffuse: 0.8,
+        specular: 0.5,
+      };
+      drawPhongSphere(ctx, sphere, light);
+      break;
+    default:
+      break;
   }
+
   drawAxis(ctx, depth);
 }
 
@@ -35,11 +58,16 @@ export function handleOnKey(
   rects: Point[][],
   startpos: Point[][],
   setDepth: React.Dispatch<React.SetStateAction<number>>,
-  setPainted: React.Dispatch<React.SetStateAction<boolean>>
+  setView: React.Dispatch<React.SetStateAction<View>>
 ) {
   switch (key) {
     case " ":
-      setPainted((prev) => !prev);
+      setView((prev) => {
+        if (prev === "painted") return "mesh";
+        if (prev === "mesh") return "sphere";
+        if (prev === "sphere") return "painted";
+        return "painted";
+      });
       break;
 
     case "m":
@@ -163,7 +191,7 @@ function drawAxis(ctx: CanvasRenderingContext2D, depth: number) {
 
   const x: Point2D = proj(
     {
-      x: window.innerWidth,
+      x: SCREEN.W,
       y: 0,
       z: 0,
     },
@@ -172,7 +200,7 @@ function drawAxis(ctx: CanvasRenderingContext2D, depth: number) {
   const y: Point2D = proj(
     {
       x: 0,
-      y: window.innerWidth,
+      y: SCREEN.W,
       z: 0,
     },
     depth
