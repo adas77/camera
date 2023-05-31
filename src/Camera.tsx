@@ -11,7 +11,6 @@ type Props = {
 
 const Camera = ({ data, dataSet, setData }: Props) => {
   const [pos, setPos] = useState<Point[][]>(data.rects);
-  // const [painted, setPainted] = useState(true);
   const [view, setView] = useState<View>("sphere");
   const [depth, setDepth] = useState(DEPTH);
   const [showPrompt, setShowPrompt] = useState(false);
@@ -54,15 +53,25 @@ const Camera = ({ data, dataSet, setData }: Props) => {
           >
             Show Prompt
           </button>
-          <ChooseData data={data} dataSet={dataSet} setData={setData} />
+          {(view === "mesh" || view === "painted") && (
+            <ChooseData
+              data={data}
+              dataSet={dataSet}
+              setData={setData}
+              view={view}
+            />
+          )}
         </div>
         <div className="flex gap-1">
-          <button
-            disabled
-            className="py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 bg-white rounded-lg border border-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700"
-          >
-            Depth: {depth}
-          </button>
+          {(view === "mesh" || view === "painted") && (
+            <button
+              disabled
+              className="py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 bg-white rounded-lg border border-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700"
+            >
+              Depth: {depth}
+            </button>
+          )}
+
           <button
             disabled
             className="py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 bg-white rounded-lg border border-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700"
@@ -78,6 +87,7 @@ const Camera = ({ data, dataSet, setData }: Props) => {
       )}
       <canvas
         onWheel={(e) => {
+          if (view === "flat" || view == "sphere") return;
           const f = e.deltaY < 0 ? -1 : e.deltaY > 0 ? 1 : undefined;
           if (f) {
             setDepth((prev) => {

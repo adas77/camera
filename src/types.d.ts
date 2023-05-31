@@ -49,4 +49,29 @@ type SphereLight = {
   specular: number;
 };
 
-type View = "painted" | "mesh" | "sphere";
+type View = "painted" | "mesh" | "sphere" | "flat";
+
+type Color = {
+  r: number;
+  g: number;
+  b: number;
+  a?: number;
+};
+
+type FrameBuffer = {
+  data: Uint32Array;
+  width: number;
+  height: number;
+};
+
+type PhongParams = {
+  ka: number;
+  kd: number;
+  ks: number;
+  ia: number[];
+  id: number[];
+  is: number[];
+  alpha: number;
+  m: number[];
+  rad: number;
+};

@@ -1,132 +1,114 @@
-import { SCREEN } from "../consts";
+import { add, cos, dot, multiply, sin, sqrt, subtract } from "mathjs";
 
-const COLOR = "#FF0000";
+const COL = 0xff;
+const COL_RGB: Color = {
+  r: 255,
+  g: 0,
+  b: 255,
+};
+const COL_BG: Color = {
+  r: 0,
+  g: 0,
+  b: 0,
+};
+const color = ({ r, g, b, a = 255 }: Color): number => {
+  r = Math.min(Math.max(r, 0), 255);
+  g = Math.min(Math.max(g, 0), 255);
+  b = Math.min(Math.max(b, 0), 255);
+  a = Math.min(Math.max(a, 0), 255);
+  let abgr =
+    ((a & COL) << 24) | ((b & COL) << 16) | ((g & COL) << 8) | (r & COL);
+  return abgr;
+};
 
-export function drawSphere(ctx: CanvasRenderingContext2D) {
-  const radius = Math.min(SCREEN.W, SCREEN.H) / 2;
-  const centerX = SCREEN.W / 2;
-  const centerY = SCREEN.H / 2;
-
-  ctx.beginPath();
-  ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-  ctx.fillStyle = COLOR;
-  ctx.fill();
-  ctx.closePath();
-}
-
-export function drawPhongSphere(
-  ctx: CanvasRenderingContext2D,
-  sphere: Sphere,
-  light: SphereLight
-) {
-  for (let x = 0; x < SCREEN.W; x++) {
-    for (let y = 0; y < SCREEN.H; y++) {
-      const point: Point = { x, y, z: calculateZOnSphere(x, y, sphere) };
-      const color = calculatePhongColor(point, sphere, light);
-      drawPixel(ctx, x, y, color);
-    }
-  }
-}
-
-function calculateZOnSphere(x: number, y: number, sphere: Sphere): number {
-  const { center, radius } = sphere;
-  const dx = x - center.x;
-  const dy = y - center.y;
-  const dz = Math.sqrt(radius ** 2 - dx ** 2 - dy ** 2);
-  return center.z + dz;
-}
-
-function calculatePhongColor(
-  point: Point,
-  sphere: Sphere,
-  light: SphereLight
-): string {
-  const { center } = sphere;
-  const { pos, ambient, diffuse, specular } = light;
-
-  // Calculate the normal vector at the point on the sphere
-  const normal: Point = normalizeVector(subtractVectors(point, center));
-
-  const lightDirection: Point = normalizeVector(subtractVectors(pos, point));
-  const ambientColor = multiplyColor(COLOR, ambient);
-  const diffuseFactor = Math.max(dotProduct(normal, lightDirection), 0);
-  const diffuseColor = multiplyColor(COLOR, diffuse * diffuseFactor);
-
-  const reflectionDirection: Point = normalizeVector(
-    subtractVectors(
-      multiplyVector(normal, 2 * dotProduct(normal, lightDirection)),
-      lightDirection
-    )
-  );
-
-  const viewDirection: Point = normalizeVector(
-    subtractVectors({ x: SCREEN.W / 2, y: SCREEN.H / 2, z: -100 }, point)
-  );
-
-  const specularFactor = Math.pow(
-    Math.max(dotProduct(reflectionDirection, viewDirection), 0),
-    32
-  );
-  const specularColor = multiplyColor("#FFFFFF", specular * specularFactor);
-
-  const finalColor = addColors(
-    addColors(ambientColor, diffuseColor),
-    specularColor
-  );
-
-  return finalColor;
-}
-
-function normalizeVector(vector: Point): Point {
-  const { x, y, z } = vector;
-  const length = Math.sqrt(x ** 2 + y ** 2 + z ** 2);
-  return { x: x / length, y: y / length, z: z / length };
-}
-
-function subtractVectors(a: Point, b: Point): Point {
-  return { x: a.x - b.x, y: a.y - b.y, z: a.z - b.z };
-}
-
-function multiplyVector(vector: Point, scalar: number): Point {
-  return { x: vector.x * scalar, y: vector.y * scalar, z: vector.z * scalar };
-}
-
-function dotProduct(a: Point, b: Point): number {
-  return a.x * b.x + a.y * b.y + a.z * b.z;
-}
-
-function multiplyColor(color: string, scalar: number): string {
-  const r = parseInt(color.substring(2, 4), 16);
-  const g = parseInt(color.substring(3, 6), 16);
-  const b = parseInt(color.substring(6, 8), 16);
-  console.log(r, g, b);
-  const multipliedR = Math.round(r * scalar);
-  const multipliedG = Math.round(g * scalar);
-  const multipliedB = Math.round(b * scalar);
-  return `#${multipliedR.toString(16)}${multipliedG.toString(
-    16
-  )}${multipliedB.toString(16)}`;
-}
-
-function addColors(color1: string, color2: string): string {
-  const r1 = parseInt(color1.substring(1, 3), 16);
-  const g1 = parseInt(color1.substring(3, 5), 16);
-  const b1 = parseInt(color1.substring(5, 7), 16);
-  const r2 = parseInt(color2.substring(1, 3), 16);
-  const g2 = parseInt(color2.substring(3, 5), 16);
-  const b2 = parseInt(color2.substring(5, 7), 16);
-  const addedR = Math.min(r1 + r2, 255);
-  const addedG = Math.min(g1 + g2, 255);
-  const addedB = Math.min(b1 + b2, 255);
-  return `#${addedR.toString(16)}${addedG.toString(16)}${addedB.toString(16)}`;
-}
-
-function drawPixel(
-  ctx: CanvasRenderingContext2D,
+const setPixel = (
+  { data, width, height }: FrameBuffer,
   x: number,
   y: number,
-  color: string
-) {
-  ctx.fillStyle = color;
-  ctx.fillRect(x, y, 1, 1);
+  argb: number
+): void => {
+  if (x < 0 || y < 0 || x >= width || y >= height) return;
+  data[Math.floor(y) * width + Math.floor(x)] = argb;
+};
+
+export function drawPhong(ctx: CanvasRenderingContext2D, flat?: boolean): void {
+  const width = 200;
+  const height = 200;
+  const frameBuffer: FrameBuffer = {
+    data: new Uint32Array(width * height),
+    width,
+    height,
+  };
+
+  const phongParams: PhongParams = {
+    ka: 0.2,
+    kd: 0.4,
+    ks: 0.5,
+    ia: [COL_RGB.r, COL_RGB.g, COL_RGB.b],
+    id: [COL_RGB.r, COL_RGB.g, COL_RGB.b],
+    is: [COL_BG.r, COL_BG.g, COL_BG.b],
+    alpha: 64,
+    m: [1, 4, 3],
+    rad: 1.0,
+  };
+
+  for (let i = 0; i < width; i++) {
+    for (let j = 0; j < height; j++) {
+      let x = ((i - width / 2) / width) * 2;
+      let y = ((j - height / 2) / height) * 2;
+      let distance = x ** 2 + y ** 2;
+      if (distance < phongParams.rad ** 2) {
+        let z = Math.sqrt(phongParams.rad ** 2 - distance);
+        let Lm = subtract(phongParams.m, [x, y, z]);
+
+        let LmMagnitude = sqrt(Lm[0] ** 2 + Lm[1] ** 2 + Lm[2] ** 2);
+        Lm = multiply(1 / LmMagnitude, Lm);
+
+        let N = [x / phongParams.rad, y / phongParams.rad, z / phongParams.rad];
+        if (flat) {
+          let yaw = Math.atan2(N[1], N[2]);
+          let pitch = Math.atan2(N[0], sqrt(N[1] ** 2 + N[2] ** 2));
+          let steps = 3;
+          yaw = Math.round(yaw * steps) / steps;
+          pitch = Math.round(pitch * steps) / steps;
+          let xzLen = cos(pitch);
+          N = [xzLen * sin(-yaw), sin(pitch), xzLen * cos(-yaw)];
+          N = multiply(1 / sqrt(N[0] ** 2 + N[1] ** 2 + N[2] ** 2), N);
+        }
+
+        let rgb: number[] = [0, 0, 0];
+
+        let ambient = multiply(phongParams.ka, phongParams.ia);
+        let diffuse = multiply(
+          phongParams.id,
+          Math.max(multiply(phongParams.kd, dot(Lm, N)), 0)
+        );
+
+        let Rm = subtract(multiply(2, multiply(multiply(Lm, N), N)), Lm);
+        let specular = multiply(
+          phongParams.is,
+          phongParams.ks * Math.max(Rm[2], 0) ** phongParams.alpha
+        );
+
+        rgb = add(ambient, rgb);
+        rgb = add(diffuse, rgb);
+        rgb = add(specular, rgb);
+
+        setPixel(frameBuffer, i, j, color({ r: rgb[0], g: rgb[1], b: rgb[2] }));
+      } else {
+        setPixel(frameBuffer, i, j, COL);
+      }
+    }
+  }
+
+  var iData = new ImageData(
+    new Uint8ClampedArray(frameBuffer.data.buffer),
+    frameBuffer.width,
+    frameBuffer.height
+  );
+  ctx.putImageData(
+    iData,
+    (ctx.canvas.width - frameBuffer.width) / 2,
+    (ctx.canvas.height - frameBuffer.height) / 2
+  );
 }

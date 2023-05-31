@@ -1,6 +1,6 @@
-import { DEPTH, DEPTH_JUMP, SCREEN } from "../consts";
+import { COLOR, COLOR_STROKE, DEPTH, DEPTH_JUMP, SCREEN } from "../consts";
 import { proj, tr } from "./matrix";
-import { drawPhongSphere } from "./phong";
+import { drawPhong } from "./phong";
 
 export function rerender(
   ctx: CanvasRenderingContext2D,
@@ -10,8 +10,8 @@ export function rerender(
 ) {
   ctx.beginPath();
   ctx.clearRect(0, 0, SCREEN.W, SCREEN.H);
-  // ctx.strokeStyle = "orange";
-  // ctx.fillStyle = COLOR;
+  ctx.strokeStyle = COLOR_STROKE;
+  ctx.fillStyle = COLOR;
 
   switch (view) {
     case "mesh":
@@ -33,19 +33,13 @@ export function rerender(
       break;
 
     case "sphere":
-      const sphere: Sphere = {
-        center: { x: SCREEN.W / 2, y: SCREEN.H / 2, z: 0 },
-        radius: Math.min(SCREEN.W, SCREEN.H) / 2,
-      };
-
-      const light: SphereLight = {
-        pos: { x: SCREEN.W / 2, y: SCREEN.H / 2, z: -100 },
-        ambient: 0.2,
-        diffuse: 0.8,
-        specular: 0.5,
-      };
-      drawPhongSphere(ctx, sphere, light);
+      drawPhong(ctx);
       break;
+
+    case "flat":
+      drawPhong(ctx, true);
+      break;
+
     default:
       break;
   }
@@ -65,7 +59,8 @@ export function handleOnKey(
       setView((prev) => {
         if (prev === "painted") return "mesh";
         if (prev === "mesh") return "sphere";
-        if (prev === "sphere") return "painted";
+        if (prev === "sphere") return "flat";
+        if (prev === "flat") return "painted";
         return "painted";
       });
       break;
@@ -252,15 +247,12 @@ function connectWalls(
     ctx.moveTo(a_.x, a_.y);
 
     ctx.lineTo(b_.x, b_.y);
-    // ctx.stroke();
     ctx.fill();
 
     ctx.lineTo(c_.x, c_.y);
-    // ctx.stroke();
     ctx.fill();
 
     ctx.lineTo(d_.x, d_.y);
-    // ctx.stroke();
     ctx.fill();
 
     ctx.lineTo(a_.x, a_.y);
