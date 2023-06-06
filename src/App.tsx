@@ -8,7 +8,10 @@ export function Prompt() {
       <p className="font-bold mb-4 text-l">Sterowanie</p>
       <ul>
         <li>
-          <b>SPACJA</b> - Zmień tryb wyświetlania
+          <b>{"->"}</b> - Zmień tryb wyświetlania - następny
+        </li>
+        <li>
+          <b>{"<-"}</b> - Zmień tryb wyświetlania - poprzedni
         </li>
         <li>
           <b>u</b> - Zoom In
@@ -74,7 +77,7 @@ type ChooseDataProps = {
 export function ChooseData({ data, dataSet, setData }: ChooseDataProps) {
   return (
     <select className="block focus:outline-none text-white bg-purple-700 hover:bg-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-purple-600 dark:hover:bg-purple-700">
-      <option selected>{data.label}</option>
+      <option defaultValue={data.label}>{data.label}</option>
       {dataSet
         .filter((d) => d.label !== data.label)
         .map((d) => (

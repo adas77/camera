@@ -3,3 +3,10 @@ export const ANGLE_DEG: number = 2;
 export const DEPTH: number = 400;
 export const DEPTH_JUMP: number = 10;
 export const E: number = 0.001;
+export const SCREEN = {
+  W: window.innerWidth,
+  H: window.innerHeight,
+};
+
+export const COLOR = "magenta";
+export const COLOR_STROKE = "black";
