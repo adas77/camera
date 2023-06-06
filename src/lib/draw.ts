@@ -1,5 +1,6 @@
 import { COLOR, COLOR_STROKE, DEPTH, DEPTH_JUMP, SCREEN } from "../consts";
 import { proj, tr } from "./matrix";
+import { swapArray, testVisibility } from "./painter";
 import { drawPhong } from "./phong";
 
 export function rerender(
@@ -12,10 +13,11 @@ export function rerender(
   ctx.clearRect(0, 0, SCREEN.W, SCREEN.H);
   ctx.strokeStyle = COLOR_STROKE;
   ctx.fillStyle = COLOR;
+  let walls: Wall[];
 
   switch (view) {
-    case "mesh":
-      const walls: Wall[] = [];
+    case "painted":
+      walls = [];
       rects.forEach((rect) => {
         walls.push({ a: rect[0], b: rect[1], c: rect[2], d: rect[3] });
         walls.push({ a: rect[4], b: rect[5], c: rect[6], d: rect[7] });
@@ -25,10 +27,37 @@ export function rerender(
         walls.push({ a: rect[1], b: rect[2], c: rect[6], d: rect[5] });
       });
       walls.sort((a, b) => countCenter(b) - countCenter(a));
+
       connectWalls(walls, ctx, depth);
       break;
 
-    case "painted":
+    case "painted2":
+      walls = [];
+      rects.forEach((rect) => {
+        walls.push({ a: rect[0], b: rect[1], c: rect[2], d: rect[3] });
+        walls.push({ a: rect[4], b: rect[5], c: rect[6], d: rect[7] });
+        walls.push({ a: rect[0], b: rect[4], c: rect[5], d: rect[1] });
+        walls.push({ a: rect[3], b: rect[7], c: rect[6], d: rect[2] });
+        walls.push({ a: rect[0], b: rect[3], c: rect[7], d: rect[4] });
+        walls.push({ a: rect[1], b: rect[2], c: rect[6], d: rect[5] });
+      });
+      walls.sort((a, b) => countCenter(b) - countCenter(a));
+
+      for (let i = 0; i < walls.length; i++) {
+        for (let j = i; j < walls.length; j++) {
+          if (testVisibility(walls[i], walls[j], depth)) {
+            console.log("SWAP");
+            swapArray(walls, i, j);
+          } else {
+            console.log("NOT SWAP");
+          }
+        }
+      }
+
+      connectWalls(walls, ctx, depth);
+      break;
+
+    case "mesh":
       rects.forEach((rect) => drawRect(rect, ctx, depth));
       break;
 
@@ -54,10 +83,22 @@ export function handleOnKey(
   setDepth: React.Dispatch<React.SetStateAction<number>>,
   setView: React.Dispatch<React.SetStateAction<View>>
 ) {
+  console.log(key);
   switch (key) {
-    case " ":
+    case "ArrowRight":
       setView((prev) => {
-        if (prev === "painted") return "mesh";
+        if (prev === "painted") return "flat";
+        if (prev === "flat") return "sphere";
+        if (prev === "sphere") return "mesh";
+        if (prev === "mesh") return "painted2";
+        if (prev === "painted2") return "painted";
+        return "painted";
+      });
+      break;
+    case "ArrowLeft":
+      setView((prev) => {
+        if (prev === "painted") return "painted2";
+        if (prev === "painted2") return "mesh";
         if (prev === "mesh") return "sphere";
         if (prev === "sphere") return "flat";
         if (prev === "flat") return "painted";
@@ -161,12 +202,12 @@ function drawRect2(
   connectWalls(walls_, ctx, depth);
 }
 
-function countCenter(w: Wall): number {
+export function countCenter(w: Wall): number {
   const x = w.a.x + w.b.x + w.c.x + w.d.x;
   const y = w.a.y + w.b.y + w.c.y + w.d.y;
   const z = w.a.z + w.b.z + w.c.z + w.d.z;
 
-  const p3d: Point = { x: x / 3, y: y / 3, z: z / 3 };
+  const p3d: Point = { x: x / 4, y: y / 4, z: z / 4 };
   const center = Math.sqrt(
     Math.pow(p3d.x, 2) + Math.pow(p3d.y, 2) + Math.pow(p3d.z, 2)
   );

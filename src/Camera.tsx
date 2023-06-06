@@ -53,17 +53,12 @@ const Camera = ({ data, dataSet, setData }: Props) => {
           >
             Show Prompt
           </button>
-          {(view === "mesh" || view === "painted") && (
-            <ChooseData
-              data={data}
-              dataSet={dataSet}
-              setData={setData}
-              view={view}
-            />
+          {(view === "mesh" || view === "painted" || view === "painted2") && (
+            <ChooseData data={data} dataSet={dataSet} setData={setData} />
           )}
         </div>
         <div className="flex gap-1">
-          {(view === "mesh" || view === "painted") && (
+          {(view === "mesh" || view === "painted" || view === "painted2") && (
             <button
               disabled
               className="py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 bg-white rounded-lg border border-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700"

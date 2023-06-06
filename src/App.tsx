@@ -8,7 +8,10 @@ export function Prompt() {
       <p className="font-bold mb-4 text-l">Sterowanie</p>
       <ul>
         <li>
-          <b>SPACJA</b> - Zmień tryb wyświetlania
+          <b>{"->"}</b> - Zmień tryb wyświetlania - następny
+        </li>
+        <li>
+          <b>{"<-"}</b> - Zmień tryb wyświetlania - poprzedni
         </li>
         <li>
           <b>u</b> - Zoom In

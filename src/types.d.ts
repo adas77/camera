@@ -49,7 +49,7 @@ type SphereLight = {
   specular: number;
 };
 
-type View = "painted" | "mesh" | "sphere" | "flat";
+type View = "painted" | "painted2" | "mesh" | "sphere" | "flat";
 
 type Color = {
   r: number;
