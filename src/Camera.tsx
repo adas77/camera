@@ -1,6 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { ChooseData, Prompt } from "./App";
-import { DEPTH, DEPTH_JUMP, SCREEN } from "./consts";
+import {
+  DEPTH,
+  DEPTH_JUMP,
+  SCREEN,
+  phongParams1,
+  phongParams2,
+  phongParams3,
+  phongParams4,
+} from "./consts";
 import { getCtx, handleOnKey, rerender } from "./lib/draw";
 
 type Props = {
@@ -12,6 +20,7 @@ type Props = {
 const Camera = ({ data, dataSet, setData }: Props) => {
   const [pos, setPos] = useState<Point[][]>(data.rects);
   const [view, setView] = useState<View>("sphere");
+  const [phongParam, setPhongParam] = useState<PhongParams>(phongParams1);
   const [depth, setDepth] = useState(DEPTH);
   const [showPrompt, setShowPrompt] = useState(false);
   const ref = useRef<HTMLCanvasElement>(null);
@@ -23,12 +32,12 @@ const Camera = ({ data, dataSet, setData }: Props) => {
 
   useEffect(() => {
     const ctx = getCtx(ref);
-    rerender(ctx, pos, view, depth);
+    rerender(ctx, pos, view, depth, phongParam);
     window.addEventListener("keydown", handleKeyDown);
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [pos, depth, view, setView, data, setData]);
+  }, [pos, depth, view, setView, data, setData, phongParam, setPhongParam]);
 
   useEffect(() => {
     setPos(data.rects);
@@ -65,6 +74,24 @@ const Camera = ({ data, dataSet, setData }: Props) => {
             >
               Depth: {depth}
             </button>
+          )}
+          {(view === "sphere" || view === "flat") && (
+            <select className="block focus:outline-none text-white bg-purple-700 hover:bg-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-purple-600 dark:hover:bg-purple-700">
+              <option defaultValue={phongParam.label}>
+                {phongParam.label}
+              </option>
+              {[phongParams1, phongParams2, phongParams3, phongParams4]
+                .filter((d) => d.label !== phongParam.label)
+                .map((d) => (
+                  <option
+                    onClick={() => setPhongParam(d)}
+                    key={d.label}
+                    value={d.label}
+                  >
+                    {d.label}
+                  </option>
+                ))}
+            </select>
           )}
 
           <button

@@ -7,7 +7,8 @@ export function rerender(
   ctx: CanvasRenderingContext2D,
   rects: Point[][],
   view: View,
-  depth: number
+  depth: number,
+  phongParams: PhongParams
 ) {
   ctx.beginPath();
   ctx.clearRect(0, 0, SCREEN.W, SCREEN.H);
@@ -62,11 +63,11 @@ export function rerender(
       break;
 
     case "sphere":
-      drawPhong(ctx);
+      drawPhong(ctx, phongParams);
       break;
 
     case "flat":
-      drawPhong(ctx, true);
+      drawPhong(ctx, phongParams, true);
       break;
 
     default:

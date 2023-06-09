@@ -1,16 +1,6 @@
 import { add, cos, dot, multiply, sin, sqrt, subtract } from "mathjs";
 
 const COL = 0xff;
-const COL_RGB: Color = {
-  r: 255,
-  g: 0,
-  b: 255,
-};
-const COL_BG: Color = {
-  r: 0,
-  g: 0,
-  b: 0,
-};
 const color = ({ r, g, b, a = 255 }: Color): number => {
   r = Math.min(Math.max(r, 0), 255);
   g = Math.min(Math.max(g, 0), 255);
@@ -31,25 +21,17 @@ const setPixel = (
   data[Math.floor(y) * width + Math.floor(x)] = argb;
 };
 
-export function drawPhong(ctx: CanvasRenderingContext2D, flat?: boolean): void {
+export function drawPhong(
+  ctx: CanvasRenderingContext2D,
+  phongParams: PhongParams,
+  flat?: boolean
+): void {
   const width = 200;
   const height = 200;
   const frameBuffer: FrameBuffer = {
     data: new Uint32Array(width * height),
     width,
     height,
-  };
-
-  const phongParams: PhongParams = {
-    ka: 0.2,
-    kd: 0.4,
-    ks: 0.5,
-    ia: [COL_RGB.r, COL_RGB.g, COL_RGB.b],
-    id: [COL_RGB.r, COL_RGB.g, COL_RGB.b],
-    is: [COL_BG.r, COL_BG.g, COL_BG.b],
-    alpha: 64,
-    m: [1, 4, 3],
-    rad: 1.0,
   };
 
   for (let i = 0; i < width; i++) {

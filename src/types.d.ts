@@ -37,18 +37,6 @@ type Data = {
   label: string;
 };
 
-type Sphere = {
-  center: Point;
-  radius: number;
-};
-
-type SphereLight = {
-  pos: Point;
-  ambient: number;
-  diffuse: number;
-  specular: number;
-};
-
 type View = "painted" | "painted2" | "mesh" | "sphere" | "flat";
 
 type Color = {
@@ -74,4 +62,5 @@ type PhongParams = {
   alpha: number;
   m: number[];
   rad: number;
+  label: string;
 };
